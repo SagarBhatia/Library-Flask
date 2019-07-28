@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<title>Issue History</title>
+	</head>
+	<body>
+		<!-- Enter your UersID - <input type="text" id="user" onkeyup="myFunction()" /> -->
+		<h3>Your book issue history - </h3>
+		<p id="here"></p>
+		<table id="content" border>
+
+		</table>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+		<script>
+			/*var xhttp = XMLHttpRequest();
+			xhttp.
+			xhttp.open("GET", "http:localhost:5000/library/users/v1/issuehistory", true);
+			xhttp.send();*/
+		//	session_id=1;
+			token=localStorage.getItem("token");
+		data=JSON.parse("{\"token\":\""+token+"\"}");
+		$.post({url:"http://localhost:8010/library/users/v1/issuehistory",contentType:"application/json",data:JSON.stringify(data),success:function(result){
+				//console.log(result);
+				check(result);
+				var table="<tr><th>RecordID</th><th>BookID</th><th>I_DATETIME</th><th>IssueDays</th><th>S_DATETIME</th><th>Status</th></tr>";
+				//document.getElementById("here").innerHTML = result[0].BookID;
+				document.getElementById("content").innerHTML = table;
+				
+				for(var i=0;i<result.length;i++){
+					document.getElementById("content").innerHTML+=
+					"<tr><td>"+result[i].RecordID+"</td><td>"+result[i].BookID+"</td><td>"+result[i].I_DATETIME+"</td><td>"+result[i].IssueDays+"</td><td>"+result[i].S_DATETIME+"</td><td>"+result[i].Status+"</td></tr>";
+				}
+			}});
+			function check(result){
+   		for(key in result)
+   		{
+       if(key=="valid")
+       {
+           localStorage.removeItem("token");
+               location.redirect("login.html");
+       }
+   }
+}
+
+
+		</script>
+	</body>
+</html>

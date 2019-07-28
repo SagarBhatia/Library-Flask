@@ -1,0 +1,57 @@
+<html>
+
+<body>
+    Enter book ID <input type="text" id="bid" /></br>
+    <button onclick="call()">Submit</button>
+    <br />
+    <p id="response"></p><br />
+    <a href="admin_home.html" id="link" hidden>Go to admin homepage</a>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <!-- <script src="jquery-file.js"></script> -->
+
+    <script>
+        function call() {
+            //console.log(document.getElementById("bid"));
+            var token = localStorage.getItem("token");
+            token_json = "\"token\":\"" + token + "\"";
+
+            var x = "{\"bid\":" + document.getElementById("bid").value + "," + token_json + "}";
+            //console.log(x);
+            var data = JSON.parse(x);
+            $.post({
+                url: "http://localhost:5500/library/admin/v1/submit", contentType: "application/json", data: JSON.stringify(data), success: function (result) {
+                    check(result);
+                    document.getElementById("response").innerHTML = result["message"];
+                    link.removeAttribute("hidden");
+                }
+            })
+        }
+
+    </script>
+</body>
+
+</html>
+
+<!-- @app.route('/library/admin/v1/submit', methods=['PUT','POST'])
+@token_required
+def updtees():
+	mydb = mysql.connect()
+	mycursor = mydb.cursor()
+	try:
+        data = request.get_json()
+        bid = data["bid"]
+		if request.method == 'PUT' or request.method == 'POST':
+            mycursor.execute("UPDATE book SET Available = 1 WHERE BookID=%s",[bid])
+			mycursor.execute("UPDATE Records SET Status = '0', S_DATETIME = CURRENT_TIMESTAMP() WHERE BookID=%s and Status = '1'",[bid])
+			mydb.commit()
+			resp = jsonify('Book has been returned')
+			resp.status_code = 200
+			return resp
+		else:
+			return not_found()
+	except Exception as e:
+		print(e)
+	finally:
+		mycursor.close() 
+		mydb.close() -->

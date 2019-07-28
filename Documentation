@@ -1,0 +1,45 @@
+List of endpoints
+
+-1. All records 	(A) - allrecords
+-2. User records 	(A) - userrecords
+-3. Book history 	(A) - bookhistory
+-4. Waitlist 		(A) - waitlist
+-5. Add user 		(A) - addusers
+-6. Update user 	(A) - updateusers
+-7. Remove user 	(A) - removeusers
+-8. Add book 		(A) - addbook
+-9. Update book 	(A) - updatebook
+-10. Remove book 	(A) - removebook
+-11. Issue history 	(U) - issuehistory
+-12. Profile 		(U) - profile
+-13. Admin register (A) - register2
+-14. Admin login 	(A) - login2
+-15. User register 	(U) - register
+-16. User login 	(U) - login
+-17. Notify 		(U) - notify
+-18. Book list 		(U) - booklist
+-19. User list 		(A) - userslist
+-20. Book details 	(U) - book
+-21. Issue 			(U) - issue
+-22. Submit 		(A) - submit
+
+
+List of pages
+
+1. addtocart - 18, 17
+2. adminlogin - 14 
+3. adminregister - 13
+4. allrecords - 1
+5. bookhistory - 3
+6. books_crud - 18, 20, 8, 9, 10
+7. cart - 18, 21
+8. issuehistory - 11
+9. login - 16
+10. profile - 12
+11. register - 15
+12. submit - 22
+13. userrecords - 2
+14. users_crud - 19, 5, 6, 7
+15. waitlist - 4
+16. user_home
+17. admin_home

@@ -1,0 +1,114 @@
+<html>
+<body>
+<table id="table" border=1>
+
+</table>
+<p id="notified"></p>
+<script src="./jquery.js"></script>
+
+<script >
+var uid = 1;
+function check(result){
+    for(key in result)
+    {
+        if(key=="valid")
+        {
+            localStorage.removeItem("token");
+                location.redirect("login.html");
+        }
+    }
+}
+
+$.ajax({url: "http://localhost:5000/library/users/booklist", success: function(result){
+    check(result);
+    document.getElementById("table").innerHTML = "    <tr><th>Author</th><th>BookName</th><th>ISBN</th><th>Rate</th><th>Add to Cart</th></tr>"
+var bid=' ';
+    
+    for(key in result)
+    {
+        //console.log(result[key]);
+            //document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td>";
+            if(result[key].Available==1)
+            {
+
+                //
+                if(localStorage.getItem("notify")!=null)
+                     bid=localStorage.getItem("notify").split(",");
+                     if(bid.indexOf(result[key].BookID)!=-1)
+                     remove(result[key].BookID);
+
+                //check for local storage to see if book is in cart
+                 if(localStorage.getItem("BookID "+uid)!=null)
+                bid=localStorage.getItem("BookID "+uid).split(",");
+                else
+                bid=[];
+
+                //Add book if not in cart or diable button if available in cart
+                if(bid.indexOf(result[key].BookID.toString())==-1)
+                document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"add("+result[key].BookID+")\">ADD</button></td></tr>"
+                else
+                document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"add("+result[key].BookID+")\" disabled>ADD</button></td></tr>"
+
+            }
+            //document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"add("+result[key].BookID+")\">ADD</button></td></tr>"
+            else
+            {
+                    if(localStorage.getItem("notify")!=null)
+                     bid=localStorage.getItem("notify").split(",");
+                     else
+                     bid=[];
+                    // console.log(bid.indexOf(result[key].BookID));
+                      if(bid.indexOf(result[key].BookID.toString())==-1)
+                      document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"notify("+result[key].BookID+")\">NOTIFY</button></td></tr>"             
+                      else
+                      document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"notify("+result[key].BookID+")\" disabled>NOTIFY</button></td></tr>"             
+            }
+            
+    }
+            
+    }});
+function add(id){
+    
+    id=id.toString();
+    var bid = [];
+    if(localStorage.getItem("BookID "+uid)!=null){
+             bid=localStorage.getItem("BookID "+uid).split(",");
+    }
+    if(bid.indexOf(id)==-1)
+    {bid.push(id);
+    localStorage.setItem("BookID "+uid,bid);}
+    location.reload();
+}
+
+function notify(id){
+    data1=JSON.parse("{\"bid\":"+id+",\"uid\":"+uid+"}");
+    $.post({url: "http://localhost:5000/library/users/notify",data:JSON.stringify(data1),contentType:"application/json",success: function(result){
+            check(result);
+            document.getElementById("notified").innerHTML="Notified";
+    }});
+    id=id.toString();
+    var bid = [];
+    if(localStorage.getItem("notify")!=null){
+             bid=localStorage.getItem("notify").split(",");
+    }
+    if(bid.indexOf(id)==-1)
+    {bid.push(id);
+    localStorage.setItem("notify",bid);}
+    location.reload();
+}
+
+
+function remove(id){
+    id=id.toString();
+    var bid = [];
+
+    bid=localStorage.getItem("BookID "+uid).split(",");
+    bid.splice( bid.indexOf(id), 1 );
+
+    localStorage.setItem("BookID "+uid,bid); 
+    location.reload();
+}
+//console.log(data);
+</script>
+</body>
+</html>

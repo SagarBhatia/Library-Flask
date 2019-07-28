@@ -1,0 +1,75 @@
+<html>
+    <body>
+        Enter user ID <input type="text" id="uid" /></br>
+        <button onclick="call()">Submit</button>
+
+        <table id="table" border="1">
+
+        </table>    
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <!-- <script src="jquery-file.js"></script> -->
+        
+        <script>
+            function call(){
+                //console.log(document.getElementById("bid"));
+                var token = localStorage.getItem("token");
+                token_json = "\"token\":\""+token+"\"";
+
+                var x = "{\"uid\":"+document.getElementById("uid").value+token_json+"}";
+                console.log(x);
+                var data = JSON.parse(x);
+                var header = "<tr><th>Record ID</th><th>Book ID</th><th>Book Name</th><th>Issue Days</th><th>Issue Date</th><th>Submit Date</th><th>Current Status</th></tr>";
+                document.getElementById("table").innerHTML = header;
+                $.post({url:"http://localhost:5100/library/admin/v1/userrecords", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                    console.log(result);
+                    check(result);
+                    for(key in result){
+                        t = "<tr><td>"+key+"</td><td>"+result[key]['BookID']+"</td><td>"+result[key]['BookName']+"</td><td>"+result[key]['IssueDays']+"</td>";
+                        t+="<td>"+result[key]['I_DATETIME']+"</td><td>"+result[key]['S_DATETIME']+"</td><td>"+result[key]['Status']+"</td></tr>";
+                        document.getElementById("table").innerHTML+=t;
+                        //console.log(user+" "+result[user]);
+                    }
+                }})
+                function check(result){
+   for(key in result)
+   {
+       if(key=="valid")
+       {
+           localStorage.removeItem("token");
+               location.redirect("login.html");
+       }
+   }
+}
+
+            }
+        </script>
+    </body>
+</html>
+
+<!-- @app.route('/library/admin/v1/userrecords', methods=['GET'])
+def uqaser():
+    try:
+        mydb = mysql.connect()
+        mycursor = mydb.cursor(pymysql.cursors.DictCursor)
+
+        data = request.get_json()
+        uid = data["uid"]
+        
+        mycursor.execute("SELECT * FROM Records WHERE UserID=%s", uid)
+        rows = mycursor.fetchall()
+        bd={}
+        mycursor.execute("SELECT BookID, BookName from book")
+        books = mycursor.fetchall()
+        for b in books:
+            bd.update({b['BookID']:b['BookName']})
+        d={}
+        for row in rows:
+            row["BookName"]=bd[row['BookID']]
+            d.update({str(row["RecordID"]):row})
+        return jsonify(d)
+    except Exception as e:
+        print(e)
+    finally:
+        mycursor.close() 
+        mydb.close() -->

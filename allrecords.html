@@ -1,0 +1,60 @@
+<html>
+    <body>
+        <h5>Data should come here</h5>
+        <table id="table" border="1">
+
+        </table>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <!-- <script src="jquery-file.js"></script> -->
+        
+        <script>
+            var token = localStorage.getItem("token");
+            //token_json = "\"token\":\""+token+"\"";
+            token = JSON.parse("{\"token\":\""+token+"\"}");
+            var header = "<tr><th>Record ID</th><th>User ID</th><th>Book ID</th><th>Issue Days</th>";
+                header+= "<th>Issue Date</th><th>Submit Date</th><th>Current Status</th></tr>";
+            document.getElementById("table").innerHTML = header;
+            $.ajax({url:"http://localhost:5100/library/admin/v1/allrecords", data: JSON.stringify(token), contentType:"application/json", function (result) {
+                console.log(result);
+                check(result);
+                for(record in result){
+                    t = "<tr><td>"+record+"</td><td>"+result[record]['UserID']+"</td><td>"+result[record]['BookID']+"</td><td>"+result[record]['IssueDays']+"</td>";
+                    t+= "<td>"+result[record]['I_DATETIME']+"</td><td>"+result[record]['S_DATETIME']+"</td><td>"+result[record]['Status']+"</td></tr>";
+                    document.getElementById("table").innerHTML+=t;
+                    //console.log(user+" "+result[user]);
+                }
+            }})
+            function check(result){
+   for(key in result)
+   {
+       if(key=="valid")
+       {
+           localStorage.removeItem("token");
+               location.redirect("login.html");
+       }
+   }
+}
+
+        </script>
+    </body>
+</html>
+
+<!-- @app.route('/library/admin/v1/allrecords', methods=['GET'])
+def uussrrss():
+	try:
+		mydb = mysql.connect()
+		mycursor = mydb.cursor(pymysql.cursors.DictCursor)
+		mycursor.execute("SELECT * FROM Records")
+		rows = mycursor.fetchall()
+		d={}
+		for row in rows:
+                    d[str(row['RecordID'])]=row
+		resp = jsonify(d)
+		resp.status_code = 200
+		return resp
+	except Exception as e:
+		print(e)
+	finally:
+		mycursor.close() 
+		mydb.close() -->

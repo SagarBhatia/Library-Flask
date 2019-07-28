@@ -1,0 +1,91 @@
+<html>
+<body>
+<table id="table" border=1>
+
+</table>
+
+<button name="issue" id="issue" onclick="issue()">issue</button>
+<p id="error"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<script >
+        function check(result){
+    for(key in result)
+    {
+        if(key=="valid")
+        {
+            localStorage.removeItem("token");
+                location.redirect("login.html");
+        }
+    }
+}
+var bid=''
+if(localStorage.getItem("BookID "+uid)!=null){
+bid=localStorage.getItem("BookID "+uid).split(",");
+}
+var bookdetail='';
+console.log(bid);
+$.ajax({url: "http://localhost:5000/library/users/booklist", success: function(result){
+    check(result)
+    bookdetail=result;
+    //console.log(bookdetail);
+    document.getElementById("table").innerHTML = "    <tr><th>Author</th><th>BookName</th><th>ISBN</th><th>Rate</th><th>Remove from Cart</th></tr>"
+    for(key in result)
+    {
+  
+            if(bid.indexOf(result[key].BookID.toString())!=-1)
+            document.getElementById("table").innerHTML +="<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td><td><button onclick=\"remove("+result[key].BookID+")\">REMOVE</button></td><td><input type=\"text\" id=\"bi"+result[key].BookID+"\"/>+</td</tr>"; 
+    }
+    }});
+function remove(id){
+    id=id.toString();
+    var bid = [];
+
+    bid=localStorage.getItem("BookID "+uid).split(",");
+    bid.splice( bid.indexOf(id), 1 );
+
+    localStorage.setItem("BookID "+uid,bid); 
+    location.reload();
+}
+
+function issue()
+{
+        var bid = [];
+    bid=localStorage.getItem("BookID "+uid).split(",");
+    var isd=[];
+    for(var i=0;i<bid.length;i++)
+    {
+        isd.push(document.getElementById("bi"+bid[i]));
+    }
+    //var s=' "bid":["+bid+"]"  "
+    console.log(JSON.stringify())
+    data1=JSON.parse("{\"bid\":["+bid+"],\"uid\":"+uid+",\"isd\":["+bid+"]}");
+    console.log(bookdetail);
+    console.log(JSON.stringify(data1))
+    $.post({url: "http://localhost:5000/library/admin/issue",data:JSON.stringify(data1),contentType:"application/json",success: function(result){
+    for(key in result)
+    {
+        if(key=="nonissue")
+        {
+            document.getElementById("error").innerHTML+="Cannot issue ";
+                for(var i=0;i<result[key].length;i++)
+                {
+                    console.log(result[key][i])
+                    document.getElementById("error").innerHTML+=bookdetail[result[key][i]].BookName+",";
+                }
+                
+        }
+        else
+        {
+            document.getElementById("error").innerHTML="Issued Succesfully";
+            localStorage.removeItem("BookID "+uid);
+                location.reload();
+
+        }
+    }
+    
+    }});
+}
+</script>
+</body>
+</html>

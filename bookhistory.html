@@ -1,0 +1,79 @@
+<html>
+    <body>
+        <h5>Data should come here</h5>
+        <table id="table" border="1">
+
+        </table>
+        
+        Enter book ID <input type="text" id="bid" /><br/>
+        <button onclick="call()">Submit</button>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <!-- <script src="jquery-file.js"></script> -->
+        
+        <script>
+            function call(){
+                //console.log(document.getElementById("bid"));
+                var token = localStorage.getItem("token");
+                token_json = "\"token\":\""+token+"\"";
+                var x = "{\"bid\":"+document.getElementById("bid").value+","+token_json+"}";
+                console.log(x);
+                var data = JSON.parse(x);
+                var header = "<tr><th>User ID</th><th>Name</th><th>Status</th></tr>";
+                document.getElementById("table").innerHTML = header;
+                $.post({url:"http://localhost:5500/library/admin/v1/bookhistory", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                    console.log(result);
+                    check(result);
+                    for(user in result){
+                        t = "<tr><td>"+user+"</td><td>"+result[user][0]+"</td><td>"+result[user][1]+"</td></tr>";
+                        document.getElementById("table").innerHTML+=t;
+                        //console.log(user+" "+result[user]);
+                    }
+                }})
+                function check(result){
+   for(key in result)
+   {
+       if(key=="valid")
+       {
+           localStorage.removeItem("token");
+               location.redirect("login.html");
+       }
+   }
+}
+
+            }
+        </script>
+    </body>
+</html>
+
+<!-- @app.route('/library/admin/v1/bookhistory', methods=['GET','POST'])
+def book():
+    try:
+        mydb = mysql.connect()
+        mycursor = mydb.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        bid = data["bid"]
+        
+        final={}
+        d={}
+        mycursor.execute("SELECT UserID, Name from users")
+        users = mycursor.fetchall()
+        for u in users:
+            d.update({u['UserID']:u['Name']})
+        names = []
+        mycursor.execute("SELECT UserID, Status from records where BookID = %s", (bid))
+        uids = mycursor.fetchall()
+        if(len(uids)>0):
+            for u in uids:
+                names=[]
+                names.append(d[u['UserID']])
+                names.append(u['Status'])
+                final.update({u['UserID']:names})
+        return jsonify(final)
+        
+    except Exception as e:
+        print(e)
+    finally:
+        mycursor.close()
+        mydb.close() -->

@@ -1,0 +1,115 @@
+<html>
+    <body>
+        
+        name
+            <input type="text" id="name"/>
+            email
+            <input type="text" id="Email"/>
+            mobileno
+            <input type="text" id="Mobileno"/><br/></br>
+            <label id="pass">password</label>
+            <input type="text" id="Password"/>
+            <label id="cpass">confirm password</label>
+            <input type="text" id="CPassword"/>
+            image
+            <input type="text" id="Image"/>
+            <button id="submit" onclick="create()">ADD</button>
+            <button id="edit" onclick="edi()" hidden="true" >EDIT</button>
+            <button id="cancel" onclick="cancel()"/>CANCEL</button>
+        
+        <hr>
+        <table border="1" id="table">
+
+        </table>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+        <script>
+        function check(result){
+    for(key in result)
+    {
+        if(key=="valid")
+        {
+            localStorage.removeItem("token");
+                location.redirect("login.html");
+        }
+    }
+}
+var uid=' ';
+var userdetail=' ';
+        $.ajax({url: "http://localhost:5000/library/admin/userslist", success: function(result){
+            
+userdetail=result;
+    document.getElementById("table").innerHTML = "    <tr><th>Name</th><th>Email</th><th>Password</th><th>Mobileno</th></tr>"
+    for(key in result)
+    {
+        //console.log(result[key]);
+            document.getElementById("table").innerHTML +="<tr><td>"+result[key].Name+"</td><td>"+result[key].Email+"</td><td>"+result[key].Password+"</td><td>"+result[key].Mobileno+"</td><td><button onclick=\"edit1("+result[key].UserID+")\">EDIT</button></td><td><button onclick=\"delete1("+result[key].UserID+")\">Delete</button></td></tr>";
+        }
+    }});
+
+
+        name2=document.getElementById("name");
+        email=document.getElementById("Email");
+        Mobileno=document.getElementById("Mobileno");
+        Password=document.getElementById("Password");
+        CPassword=document.getElementById("CPassword");
+        Image=document.getElementById("Image");
+        submit=document.getElementById("submit");
+        editdata=document.getElementById("edit");
+        cancel=document.getElementById("cancel");
+        pass=document.getElementById("pass");
+        cpass=document.getElementById("cpass");
+            function create(){
+                //console.log(name2.value);
+                //console.log(email.value);
+                data =JSON.parse( "{\"Name\":\""+name2.value+"\",\"Email\":\""+email.value+"\",\"Mobileno\":\""+Mobileno.value+"\",\"Password\":\""+Password.value+"\"}");
+                $.post({url:"http://localhost:5000/library/admin/addusers", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                        location.reload();
+                }});
+            }
+
+            function edit1(id){
+                submit.setAttribute('hidden','true');
+                Password.setAttribute('hidden','true');
+                CPassword.setAttribute('hidden','true');
+                pass.setAttribute('hidden','true');
+                cpass.setAttribute('hidden','true');
+                editdata.removeAttribute('hidden');
+                uid=id;
+                name2.value=userdetail[uid].Name;
+                email.value=userdetail[uid].Email;
+                Mobileno.value=userdetail[uid].Mobileno;
+                
+                //name.value=
+            }
+
+            function edi(){
+                console.log(uid);
+
+                data = JSON.parse("{\"Name\":\""+name2.value+"\",\"Email\":\""+email.value+"\",\"Mobileno\":\""+Mobileno.value+"\",\"uid\":"+uid+"}");
+                $.post({url:"http://localhost:5000/library/admin/updateusers", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                        //console.log(result);
+                         location.reload();
+                }});
+                   
+            }
+
+            function delete1(uid){
+                //data = "{\"Name\":\""+name+"\",\"Email\":\""+email+"\",\"Mobileno\":\""+Mobileno+"\",\"Password\":\""+Password+"}";
+                data=JSON.parse("{\"uid\":"+uid+"}");
+                $.post({url:"http://localhost:5000/library/admin/removeusers", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                        location.reload();
+                }});
+            }
+
+            function cancel(){
+                    name.value=' ';
+                    email.value=' ';
+                    Password.value=' ';
+                    CPassword.value= ' ';
+                    Mobileno.value=' ';
+            }
+        </script>
+    </body>
+</html>

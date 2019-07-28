@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Profile</title>
+</head>
+<body>
+Name : <label name="name" id="name"> </label><br>
+Email: <label name="email" id="email"> </label><br>
+Phone: <label name="phone" id="phone"> </label><br><br><br>
+
+<form action="http://localhost:5100/library/users/v1/changepass" method="POST">
+Email: <input type="text" name="email" id="email">
+Old Password: <input type="text" name="old_p" id="old_p"><br>
+New Password: <input type="text" name="new_p" id="new_p"><br>
+<button name="changepass" id="changepass">Change Password</button>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script type="text/javascript">
+
+	//uid=6
+	
+	token=localStorage.getItem("token");
+	data=JSON.parse("{\"token\":\""+token+"\"}");
+	$.post({url:"http://localhost:8010/library/users/v1/profile",contentType:"application/json",data:JSON.stringify(data),success:function(result){
+		console.log(result);
+		check(result);
+		//console.log(result.token);
+		document.getElementById("name").innerHTML=result.name;
+		document.getElementById("email").innerHTML=result.email;
+		document.getElementById("phone").innerHTML=result.phone;
+		// email=document.getElementById("email");
+		// phone=document.getElementById("mobileno");
+
+	}});
+	function check(result){
+   for(key in result)
+   {
+       if(key=="message")
+       {
+           localStorage.removeItem("token");
+               location.replace("login.html");
+       }
+   }
+}
+
+
+</script>
+
+
+</body>
+</html>

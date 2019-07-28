@@ -1,0 +1,105 @@
+<html>
+    <body>
+        
+        <h3>New book entry</h3>
+        Book Name <input type="text" id="name"/>
+        Author <input type="text" id="author"/>
+        ISBN No. <input type="text" id="isbn"/><br/></br>
+        Rate <input type="text" id="rate"/>
+        Available <input type="text" id="available"/><br/><br/>
+        <input type="button" id="submit" value="OK" onclick="create()"/>
+        <button id="update" onclick="update1()" hidden="true">UPDATE</button>
+        <button id="cancel" onclick="cancel()">CANCEL</button>
+        
+        <!-- <p id="ID" hidden="true"></p> -->
+        <p id="ID"></p>
+        
+        <hr><br>
+        <h3>List of books</h3>
+        <table border="1" id="table">
+
+        </table>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+        <script>
+            function create(){
+                var token = localStorage.getItem("token");
+                token_json = "\"token\":\""+token+"\"";
+                
+                var data = "{\"BookName\":\""+document.getElementById("name").value+"\",\"Author\":\""+document.getElementById("author").value;
+                data+="\",\"ISBN\":\""+document.getElementById("isbn").value+"\",\"Rate\":\""+document.getElementById("rate").value;
+                data+="\",\"Available\":\""+document.getElementById("available").value+"\","+token_json+"}";
+                data = JSON.parse(data);
+                $.post({url:"http://localhost:5500/library/admin/v1/addbook", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                    //data sent
+                }})
+            }
+            function cancel(){
+                document.getElementById("name").innerHTML = "";
+                document.getElementById("author").innerHTML = "";
+                document.getElementById("isbn").innerHTML = "";
+                document.getElementById("rate").innerHTML = "";
+                document.getElementById("available").innerHTML = "";
+            }
+            data = JSON.parse("{"+token_json+"}");
+            $.ajax({url: "http://localhost:5500/library/users/v1/booklist", data:JSON.stringify(data), contentType:"application/json", success: function(result){
+                document.getElementById("table").innerHTML = "<tr><th>Author</th><th>BookName</th><th>ISBN</th><th>Rate</th><th>Edit</th><th>Remove</th></tr>"
+                for(key in result) {
+                    //console.log(result[key]);
+                    var d = "<tr><td>"+result[key].Author+"</td><td>"+result[key].BookName+"</td><td>"+result[key].ISBN+"</td><td>"+result[key].Rate+"</td>";
+                    var b = "<td><button id="+result[key].BookID+" onclick=\"edit1("+result[key].BookID+")\">EDIT</button></td>";
+                    b+= "<td><button id="+result[key].BookID+" onclick=\"del("+result[key].BookID+")\">DELETE</button></td>";
+                    document.getElementById("table").innerHTML += (d + b + "</tr>");
+                }
+            }});
+            function edit1(ID){
+                document.getElementById("submit").style.visibility="hidden";
+                document.getElementById("update").removeAttribute('hidden');
+                var x = "{\"ID\":"+ID+token_json+"}";
+                console.log(x);
+                x = JSON.parse(x);
+                //console.log(x);
+                $.post({url: "http://localhost:5500/library/users/v1/book", data:JSON.stringify(x), contentType:"application/json", success: function(result){
+                    //for(key in result){
+                        //console.log(result);
+                        document.getElementById("ID").innerHTML = result['BookID'];
+                        document.getElementById("name").value = result.BookName;
+                        document.getElementById("author").value = result.Author;
+                        document.getElementById("isbn").value = result.ISBN;
+                        document.getElementById("rate").value = result.Rate;
+                        document.getElementById("available").value = result.Available;
+                    //}
+                }});
+                //document.getElementById("update").click();
+            }
+            function update1(){
+                ID = document.getElementById("ID").textContent;
+                console.log(ID);
+                ID = parseInt(ID);
+                console.log(typeof(ID));
+                var data = "{\"ID\":"+ID+",";
+                console.log(data);
+                data+="\"BookName\":\""+document.getElementById("name").value+"\",\"Author\":\""+document.getElementById("author").value;
+                data+="\",\"ISBN\":\""+document.getElementById("isbn").value+"\",\"Rate\":\""+document.getElementById("rate").value;
+                data+="\",\"Available\":"+document.getElementById("available").value+token_json+"}";
+                data = JSON.parse(data);
+                console.log(data);
+                $.post({url:"http://localhost:5500/library/admin/v1/updatebook", contentType:"application/json", data:JSON.stringify(data), success: function (result) {
+                    //data sent
+                    location.reload();
+                }})
+            }
+            function del(ID){
+                console.log(ID);
+                console.log(typeof(ID));
+                var data = "{\"ID\":"+ID+token_json+"}";
+                data = JSON.parse(data);
+                $.post({url: "http://localhost:5500/library/admin/v1/removebook", data:JSON.stringify(data), contentType: "application/json", success: function(result){
+                    //id sent
+                    location.reload();
+                }});
+            }
+        </script>
+    </body>
+</html>
